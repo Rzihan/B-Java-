@@ -327,7 +327,8 @@ public class BTree {
             boolean foundTag = result.isSuccess();
 
             if (foundTag) {
-                if (node.getChild()[i - 1] != null) {
+//                if (node.getChild()[i - 1] != null) { 出现删除错误，修改一下寻找替换值的条件
+                if (node.getChild()[i] != null) {
                     substitution(node, i);
                     deleteNode(node.getChild()[i], node.getRecords()[i].getKey());
                 } else {
@@ -472,6 +473,12 @@ public class BTree {
             node.getChild()[index - 1] = aq;
         }
 
+        //空指针抛错,修改
+        if (q == null) {
+            q = new Node(node.getM());
+            node.getChild()[index] = q;
+        }
+
         //将双亲结点的记录node.records[index]插入到左结点aq中
         aq.setKeyNum(aq.getKeyNum() + 1);
         aq.getRecords()[aq.getKeyNum()] = node.getRecords()[index];
@@ -500,13 +507,15 @@ public class BTree {
      */
     private void adjustBTree(Node node, int index) {
         if (index == 0) {//删除的是最左边关键字
-            if (node.getChild()[1].getKeyNum() > node.getMin()) {//右结点可以借
-                moveLeft(node, index);
+            if (node.getChild()[1]!= null
+                    && node.getChild()[1].getKeyNum() > node.getMin()) {//右结点可以借
+                moveLeft(node, 1);
             } else {//右结点不够借
                 combine(node, 1);
             }
         } else if (index == node.getKeyNum()) {//删除的是最右边关键字
-            if (node.getChild()[index - 1].getKeyNum() > node.getMin()) {//左结点可以借
+            if (node.getChild()[index - 1] != null
+                    && node.getChild()[index - 1].getKeyNum() > node.getMin()) {//左结点可以借
                 moveRight(node, index);
             } else {//左结点不够借
                 combine(node, index);
@@ -515,7 +524,7 @@ public class BTree {
                 && node.getChild()[index - 1].getKeyNum() > node.getMin()) {
             //删除关键字在中部，而且左结点够借
             moveRight(node, index);
-        } else if (node.getChild()[index - 1] != null
+        } else if (node.getChild()[index + 1] != null
                 && node.getChild()[index + 1].getKeyNum() > node.getMin()) {
             //删除关键字在中部，而且右结点够借
             moveLeft(node, index + 1);
@@ -529,6 +538,7 @@ public class BTree {
      */
     public void output() {
         output(root, 1);
+        System.out.println();
     }
 
     /**
@@ -538,17 +548,35 @@ public class BTree {
      */
     private void output(Node node, int i) {
         StringBuilder base = new StringBuilder();
+    	for (int j = 0; j < i; j++) {
+    		base.append("\t");
+    	}
+    	if(node == null) return;
+
+        System.out.print(base.toString());
+        for(int j = 0; j < node.getKeyNum(); j++) {
+            System.out.print(node.getRecords()[j + 1].getKey() + ",");
+        }
+        System.out.println();
+
+        for (int j = 0; j <= node.getKeyNum(); j++) {
+            output(node.getChild()[j], i + 1);
+        }
+
+
+
+       /* StringBuilder base = new StringBuilder();
         for (int j = 0; j < i; j++) {
-            base.append("-----");
+            base.append("\t");
         }
         if (node == null) {
             return;
         }
         for (int j = 0; j < node.getKeyNum(); j++) {
-            output(node.getChild()[j], i + 1);
+        	output(node.getChild()[j], i + 1);
             System.out.println(base.toString() + node.getRecords()[j + 1].getKey());
         }
-        output(node.getChild()[node.getKeyNum()], i + 1);
+        output(node.getChild()[node.getKeyNum()], i + 1);*/
     }
 
     /**

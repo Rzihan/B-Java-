@@ -80,7 +80,8 @@ public class NewBTreeTest {
     }
 
     public static void main(String[] args) {
-//        testDelete();
+    	testInsert();
+        testDelete();
         testOrder();
     }
 
